@@ -76,8 +76,8 @@ public class Table
     {
         switch (mType) {
         case TREE_MAP:    return new TreeMap <> ();
-        case LINHASH_MAP: return new LinHashMap <> (KeyType.class, Comparable [].class);
-        case BPTREE_MAP:  return new BpTreeMap <> (KeyType.class, Comparable [].class);
+//        case LINHASH_MAP: return new LinHashMap <> (KeyType.class, Comparable [].class);
+//        case BPTREE_MAP:  return new BpTreeMap <> (KeyType.class, Comparable [].class);
         default:          return null;
         } // switch
     } // makeMap
@@ -162,7 +162,11 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        //  T O   B E   I M P L E M E N T E D
+        //TODO COMPLETED project command
+        for (Comparable[] row : tuples) {
+            rows.add(extract(row, attrs));
+        }
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -198,7 +202,8 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D 
-
+        //TODO select command
+        rows.add(index.get(keyVal));
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
 
@@ -217,8 +222,25 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        //  T O   B E   I M P L E M E N T E D
+        //TODO union command
 
+        //copy rows in table 1 to the final table
+        for(Comparable[] row:this.tuples){
+            rows.add(row);
+        }
+
+        //copy rows int table2 that are not in table1 to the final table
+        for (Comparable[] row2 : table2.tuples) {
+            if(!this.tuples.contains(row2)){
+                rows.add(row2);
+            }
+        }
+
+//        rows = this.tuples
+//                .stream()
+//                .filter(table2.tuples::contains)
+//                .collect(Collectors.toList());
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
 
@@ -237,8 +259,15 @@ public class Table
         if (! compatible (table2)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
+        //  T O   B E   I M P L E M E N T E D
+        //TODO minus command
+        rows.addAll(tuples);
+        for (Comparable[] row:table2.tuples) {
+            if (tuples.contains(row)) {
+                rows.remove(row);
+            }
+        }
+//        rows.stream().filter(a)
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
@@ -266,7 +295,8 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        //  T O   B E   I M P L E M E N T E D
+        //TODO join command
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
@@ -317,7 +347,7 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D 
-
+        //TODO join 2
         // FIX - eliminate duplicate columns
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
@@ -527,7 +557,7 @@ public class Table
     private boolean typeCheck (Comparable [] t)
     { 
         //  T O   B E   I M P L E M E N T E D 
-
+        //TODO typeCheck
         return true;
     } // typeCheck
 
