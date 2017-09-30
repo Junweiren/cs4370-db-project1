@@ -556,9 +556,15 @@ public class Table
      */
     private boolean typeCheck (Comparable [] t)
     { 
-        //  T O   B E   I M P L E M E N T E D 
-        //TODO typeCheck
-        return true;
+        if(!tuples.isEmpty() && t.length != 0) {
+                if(t.length != tuples.get(0).length)
+                    return false;
+                for(int i = 0; i < t.length; i++) {
+                    if(!t[i].getClass().getSimpleName().equals(tuples.get(0)[i].getClass().getSimpleName()))
+                        return false;
+                }
+            }
+            return true;
     } // typeCheck
 
     /************************************************************************************
