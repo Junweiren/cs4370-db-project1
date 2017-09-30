@@ -161,9 +161,9 @@ public class Table
         String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
+        for (Comparable[] row : tuples) {
+            rows.add(extract(row, attrs));
+        }
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
 
@@ -196,9 +196,9 @@ public class Table
         out.println ("RA> " + name + ".select (" + keyVal + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
+        
+        rows.add(index.get(keyVal));
+        
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
 
@@ -526,9 +526,15 @@ public class Table
      */
     private boolean typeCheck (Comparable [] t)
     { 
-        //  T O   B E   I M P L E M E N T E D 
-
-        return true;
+        if(!tuples.isEmpty() && t.length != 0) {
+                if(t.length != tuples.get(0).length)
+                    return false;
+                for(int i = 0; i < t.length; i++) {
+                    if(!t[i].getClass().getSimpleName().equals(tuples.get(0)[i].getClass().getSimpleName()))
+                        return false;
+                }
+            }
+            return true;
     } // typeCheck
 
     /************************************************************************************
