@@ -163,7 +163,7 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D
-        //TODO COMPLETED project command
+        //TODO project command COMPLETED
         for (Comparable[] row : tuples) {
             rows.add(extract(row, attrs));
         }
@@ -202,7 +202,7 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D 
-        //TODO select command
+        //TODO select command COMPLETED
         rows.add(index.get(keyVal));
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
@@ -223,7 +223,7 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D
-        //TODO union command
+        //TODO union command COMPLETED
 
         //copy rows in table 1 to the final table
         for(Comparable[] row:this.tuples){
@@ -236,11 +236,6 @@ public class Table
                 rows.add(row2);
             }
         }
-
-//        rows = this.tuples
-//                .stream()
-//                .filter(table2.tuples::contains)
-//                .collect(Collectors.toList());
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
 
@@ -260,14 +255,13 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
         //  T O   B E   I M P L E M E N T E D
-        //TODO minus command
+        //TODO minus command COMPLETED
         rows.addAll(tuples);
         for (Comparable[] row:table2.tuples) {
             if (tuples.contains(row)) {
                 rows.remove(row);
             }
         }
-//        rows.stream().filter(a)
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
@@ -292,11 +286,30 @@ public class Table
 
         String [] t_attrs = attributes1.split (" ");
         String [] u_attrs = attributes2.split (" ");
-
         List <Comparable []> rows = new ArrayList <> ();
-
         //  T O   B E   I M P L E M E N T E D
-        //TODO join command
+        //TODO join command COMPLETED
+        int[] cols1 = match(t_attrs);
+        int[] cols2 = table2.match(u_attrs);
+        for(int i = 0; i < tuples.size(); i++) {    //for each rows in table1, compare it with
+            for (int j = 0; j < table2.tuples.size(); j++) {    //each rows in table2
+                boolean attrsValuesEqual = true;
+                for (int k = 0; k < cols1.length; k++) {    // compare with each attribute
+                    if (!tuples.get(i)[cols1[k]].equals(table2.tuples.get(j)[cols2[k]])) {
+                        attrsValuesEqual = false;
+                        break;
+                    }
+                }
+                if(attrsValuesEqual) {
+                    rows.add(ArrayUtil.concat(tuples.get(i), table2.tuples.get(j)));
+                }
+            }
+        }
+        for (int i = 0; i < cols2.length; i++) {
+            if (table2.attribute[cols2[i]].equals(attribute[cols1[i]])) {
+                table2.attribute[cols2[i]] = table2.attribute[cols2[i]] + "2";
+            }
+        }
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
@@ -346,11 +359,50 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-        //TODO join 2
-        // FIX - eliminate duplicate columns
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+        //  T O   B E   I M P L E M E N T E D
+        //TODO join 2 COMPLETED
+        List<Integer> cols1 = new ArrayList<>();
+        List<Integer> cols2 = new ArrayList<>();
+        // find attributes that have the same names
+        for (int i = 0; i < attribute.length; i++) {
+            for (int j = 0; j < table2.attribute.length; j++) {
+                if (attribute[i].equals(table2.attribute[j])) {
+                    cols1.add(i);
+                    cols2.add(j);
+                }
+            }
+        }
+        // get attributes in tables that are not common attributes with table 1
+        ArrayList<String> attr2 = new ArrayList<>();
+        for (int i = 0; i <table2.attribute.length; i++) {
+            if(!cols2.contains(new Integer(i)))
+                attr2.add(table2.attribute[i]);
+        }
+        // convert arraylist to string[]
+        String[] table2AttrNames = new String[attr2.size()];
+        for (int i = 0; i < attr2.size(); i++) {
+            table2AttrNames[i] = attr2.get(i);
+        }
+
+        // add equivalent rows to final table
+        for(int i = 0; i < tuples.size(); i++) {    //for each rows in table1, compare it with
+            for (int j = 0; j < table2.tuples.size(); j++) {    //each rows in table2
+                boolean attrsValuesEqual = true;
+                for (int k = 0; k < cols1.size(); k++) {    // compare with each attribute
+                    if (!tuples.get(i)[cols1.get(k)].equals(table2.tuples.get(j)[cols2.get(k)])) {
+                        attrsValuesEqual = false;
+                        break;
+                    }
+                }
+                if(attrsValuesEqual) {
+                    rows.add(ArrayUtil.concat(tuples.get(i), extract(table2.tuples.get(j),table2AttrNames)));
+                }
+            }
+        }
+        // get corresponding column index for table2
+        int[] colIndex = table2.match(table2AttrNames);
+        return new Table (name + count++, ArrayUtil.concat (attribute, table2AttrNames),
+                                          ArrayUtil.concat (domain, extractDom(colIndex, table2.domain)), key, rows);
     } // join
 
     /************************************************************************************
